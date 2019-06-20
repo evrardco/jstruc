@@ -10,6 +10,7 @@ export class Game {
         this.actors = new Array();
         this.t0 = this.now = Date.now();
         this.targetDelta = 16;
+        this.timeScale = 1.0;
     }
-    
+
 }

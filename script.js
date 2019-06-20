@@ -1,6 +1,7 @@
 //don't add stuff that might throw errors here...
 import {Player} from "./classes/player.js"
 import {Game} from "./classes/game.js"
+import {ScreenText} from "./classes/screentext.js"
 
 export let game;
 
@@ -24,6 +25,17 @@ function populate(){
     let p = new Player(0, 0, 25, 250, "player");
     p.setSpeed(0, 0);
     game.actors.push(p);
+    let fpsText = new ScreenText(0, 0, "? fps", 16);
+    fpsText.time = Date.now();
+    fpsText.act = function(delta){
+        if(Date.now() - this.time >= 100){
+            this.time = Date.now();
+            let fps = 1/delta;
+            this.txt = Math.round(fps)+" fps";
+        }
+        
+    };
+    game.actors.push(fpsText);
 }
 function init(){
     game = new Game();
@@ -36,7 +48,7 @@ function mainLoop(){
 
     //acting
     for(let i = 0; i < game.actors.length; i++){
-        game.actors[i].act(1.0*(game.now - game.last)/1000);
+        game.actors[i].act(game.timeScale * (game.now - game.last) / 1000);
     }
 
     //colliding

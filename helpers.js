@@ -8,3 +8,7 @@ function arrayRemove(array, item){
     array.splice(i, 1);
     arrayRemove(array, item);
 }
+
+function round2Decimals(n) {
+    return Math.round(n * 100 + Number.EPSILON ) / 100;
+}

@@ -2,6 +2,7 @@
 import {Player} from "./classes/player.js"
 import {Game} from "./classes/game.js"
 import {ScreenText} from "./classes/screentext.js"
+import {Vector2} from "./classes/vector2.js"
 
 export let game;
 

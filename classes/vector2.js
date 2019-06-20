@@ -1,11 +1,11 @@
-class Vector2 {
+export class Vector2 {
 
     constructor(x, y) {
         this.x = x;
         this.y = y;
     }
 
-    setPos(x, y) {
+    setCoords(x, y) {
         this.x = x;
         this.y = y;
     }
@@ -43,11 +43,16 @@ class Vector2 {
     }
 
     angle(vector2) {
-        return Math.acos(this.dot(vector2) / (this.len() * vector2.len())) * (180 / Math.PI);
+        if (vector2 === undefined)
+            vector2 = new Vector2(1, 0);
+
+        let result = Math.acos(this.dot(vector2) / (this.len() * vector2.len()));
+        return round2Decimals(result * 180 / Math.PI);
     }
 
     rotate(degrees) {
-        return new Vector2(this.x * Math.cos(degrees) - this.y * Math.sin(degrees), this.x * Math.sin(degrees) + this.y * Math.cos(degrees))
+        let radians = degrees * (Math.PI / 180);
+        return new Vector2(this.x * Math.cos(radians) - this.y * Math.sin(radians), this.x * Math.sin(radians) + this.y * Math.cos(radians))
     }
     
     normalize() {
@@ -55,4 +60,5 @@ class Vector2 {
         this.x /= len;
         this.y /= len;
     }
+
 }

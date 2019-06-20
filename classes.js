@@ -11,6 +11,7 @@ class Drawable {
         this.name = name;
         this.id = id;
         id++;
+        this.length = this.w*this.w + this.h*this.h;
     }
     setSpeed(vx, vy){
         this.vx = vx;
@@ -34,14 +35,35 @@ class Drawable {
         return dist(this.x, this.y, other.x, other.y);
     }
 }
+
+class ScreenText extends Drawable {
+    constructor(x, y, string, pxlSize, color){
+        super(x, y+pxlSize, pxlSize*string.length, pxlSize, "text")
+        this.size = pxlSize;
+        this.txt = string;
+        this.color = color;
+    }
+
+    draw(ctx){
+        let oldFont = ctx.font;
+        let oldFill = ctx.fillStyle;
+        ctx.fillStyle = "#00FF00";
+        ctx.font = this.size + "px Arial";
+        ctx.fillText(this.txt, this.x, this.y);
+        ctx.fillStyle = oldFill;
+        ctx.font = oldFont;
+    }
+}
 class Rectangle extends Drawable {
     draw(ctx){
         super.draw(ctx);
         let oldFill = ctx.fillStyle;
+        
         ctx.fillStyle = "F44242";
         ctx.fillRect(this.x, this.y, this.w, this.h);
         ctx.fillStyle = oldFill;
-        this.length = this.w*this.w + this.h*this.h;
+        
+        
     }
 
     intersects(rect){

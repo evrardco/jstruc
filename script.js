@@ -10,7 +10,8 @@ var Game = {
     height: undefined,
     tickLength: 16,
     keyPressed: new Array(),
-    context: undefined
+    context: undefined,
+    timeScale: 1.0
 }
 
 document.addEventListener('readystatechange', event => {
@@ -33,6 +34,17 @@ function populate(){
         p = new Player(0, 0, 25, 250, "player");
         p.setSpeed(0, 0);
         actors.push(p);
+        fpsText = new ScreenText(0, 0, "? fps", 16);
+        fpsText.time = Date.now();
+        fpsText.act = function(delta){
+            if(Date.now() - this.time >= 100){
+                this.time = Date.now();
+                let fps = 1/delta;
+                this.txt = Math.round(fps)+" fps";
+            }
+            
+        };
+        actors.push(fpsText);
 }
 function init(){
        canvas = document.getElementById("mainScreen");
@@ -51,7 +63,7 @@ function mainLoop(){
 
     //acting
     for(let i = 0; i<actors.length; i++){
-        actors[i].act(1.0*(now-last)/1000);
+        actors[i].act(Game.timeScale*(now-last)/1000);
     }
 
     //colliding

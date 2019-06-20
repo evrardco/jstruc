@@ -8,11 +8,3 @@ function arrayRemove(array, item){
     array.splice(i, 1);
     arrayRemove(array, item);
 }
-
-function sign(n){
-    if(n >= 0){
-        return 1;
-    }else{
-        return -1;
-    }
-}

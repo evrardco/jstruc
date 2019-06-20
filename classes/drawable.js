@@ -12,6 +12,7 @@ export class Drawable {
         this.name = name;
         this.id = id;
         id++;
+        this.length = this.w*this.w + this.h*this.h;
     }
     setSpeed(vx, vy){
         this.vx = vx;

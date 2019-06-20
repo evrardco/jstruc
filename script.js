@@ -1,17 +1,8 @@
 //don't add stuff that might throw errors here...
+import {Player} from "./classes/player.js"
+import {Game} from "./classes/game.js"
 
-var actors = undefined;
-var t0 = undefined;
-var last = undefined;
-var now = undefined;
-var targetDelta = undefined;
-var Game = {
-    width: undefined,
-    height: undefined,
-    tickLength: 16,
-    keyPressed: new Array(),
-    context: undefined
-}
+export let game;
 
 document.addEventListener('readystatechange', event => {
 
@@ -30,58 +21,49 @@ document.addEventListener('readystatechange', event => {
 
 });
 function populate(){
-        p = new Player(0, 0, 25, 250, "player");
-        p.setSpeed(0, 0);
-        actors.push(p);
+    let p = new Player(0, 0, 25, 250, "player");
+    p.setSpeed(0, 0);
+    game.actors.push(p);
 }
 function init(){
-       canvas = document.getElementById("mainScreen");
-        window.addEventListener("keydown", keyDispatch);
-        window.addEventListener("keyup", keyRemove);
-        Game.width = canvas.getAttribute("width");
-        Game.height = canvas.getAttribute("height");
-        Game.context = canvas.getContext("2d");
-        actors = new Array();
-        t0 = now = Date.now();
-        targetDelta = 16;
+    game = new Game();
+    window.addEventListener("keydown", keyDispatch);
+    window.addEventListener("keyup", keyRemove);
 }
 function mainLoop(){
-    last = now;
-    now = Date.now();
+    game.last = game.now;
+    game.now = Date.now();
 
     //acting
-    for(let i = 0; i<actors.length; i++){
-        actors[i].act(1.0*(now-last)/1000);
+    for(let i = 0; i < game.actors.length; i++){
+        game.actors[i].act(1.0*(game.now - game.last)/1000);
     }
 
     //colliding
-    for(let i = 0; i<actors.length; i++){
-        actors[i].collide();
+    for(let i = 0; i < game.actors.length; i++){
+        game.actors[i].collide();
     }
 
-    Game.context.clearRect(0, 0, Game.width, Game.height);
+    game.context.clearRect(0, 0, game.width, game.height);
     //drawing
-    for(let i = 0; i<actors.length; i++){
-        actors[i].draw(Game.context);
+    for(let i = 0; i < game.actors.length; i++){
+        game.actors[i].draw(game.context);
     }
 
-    lastKey = undefined;
-    setTimeout(mainLoop, targetDelta);
+    let lastKey = undefined;
+    setTimeout(mainLoop, game.targetDelta);
 }
 
 function keyDispatch(event){
-    if(Game.keyPressed.indexOf(event.key) !== -1) return;
-    Game.keyPressed.push(event.key);
-    console.log(Game.keyPressed);
+    if(game.keyPressed.indexOf(event.key) !== -1) return;
+    game.keyPressed.push(event.key);
+    console.log(game.keyPressed);
 }
 
 function keyRemove(event){
-    let i = Game.keyPressed.indexOf(event.key);
+    let i = game.keyPressed.indexOf(event.key);
     if(i !== -1){
-        Game.keyPressed.splice(i, 1);
+        game.keyPressed.splice(i, 1);
     }
-    console.log(Game.keyPressed);
+    console.log(game.keyPressed);
 }
-
-
-

@@ -2,6 +2,8 @@
 import {Player} from "./classes/player.js"
 import {Game} from "./classes/game.js"
 import {ScreenText} from "./classes/screentext.js"
+import {Ball} from "./classes/ball.js"
+import {Rectangle} from "./classes/rectangle.js"
 import {Vector2} from "./classes/vector2.js"
 
 export let game;
@@ -23,7 +25,7 @@ document.addEventListener('readystatechange', event => {
 
 });
 function populate(){
-    let p = new Player(0, 0, 25, 250, "player");
+    let p = new Player(0, 0, 25, 150, "player");
     p.setSpeed(0, 0);
     game.actors.push(p);
     let fpsText = new ScreenText(0, 0, "? fps", 16);
@@ -37,6 +39,12 @@ function populate(){
         
     };
     game.actors.push(fpsText);
+    let w1 = new Rectangle(game.width/2, game.height/2, 50, 50, "wall");
+    game.actors.push(w1);
+
+    let ball = new Ball(game.width/2, 0, 20, 20, "ball");
+    ball.setSpeed(125, 125);
+    game.actors.push(ball);
 }
 function init(){
     game = new Game();

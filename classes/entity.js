@@ -8,22 +8,7 @@ export class Entity extends Rectangle{
     }
 
     collide(){
-        if(this.y < 0) {
-            this.vy = 0;
-            this.y = 0;
-        }
-        if(this.y + this.h > game.height){
-            this.vy = 0;
-            this.y = game.height - this.h;
-        }
-        if(this.x < 0) {
-            this.vx = 0;
-            this.x = 0;
-        }
-        if(this.x + this.w > game.width) {
-            this.vx = 0;
-            this.x = game.width - this.w;
-        }
+        this.collidedList = [this.id] 
 
         for(let i = 0; i < game.actors.length; i++){
             let actor = game.actors[i];

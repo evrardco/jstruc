@@ -8,6 +8,7 @@ import {Vector2} from "./classes/vector2.js"
 import { Bot } from "./classes/bot.js";
 import { Drawable } from "./classes/drawable.js";
 import { Circle } from "./classes/circle.js";
+import { Goal } from "./classes/goal.js";
 
 export let game;
 
@@ -28,11 +29,12 @@ document.addEventListener('readystatechange', event => {
 
 });
 function populate(){
+    let goalLeft = new Goal(0, 0, 25, game.height, "goal", 1);
+    let goalRight = new Goal(game.width - 25, 0, 25, game.height, "goal", 0);
     let circle = new Circle(game.width/2, game.height/2, game.width/8, "centerCircle", "#787878");
     let line = new Rectangle(game.width/2, 0, 2, game.height, "middleLine", "#787878");    
-    let ball = new Ball(game.width/2, 0, 20, 20, "ball");
+    let ball = new Ball(game.width/2, 0, 20, 20, "ball", 125, 125);
     let p = new Bot(25, game.height/2 - 150/2, 25, 150, "player", ball);
-    ball.setSpeed(125, 125);    
     let bot = new Bot(game.width - 2*25, game.height/2 - 150/2, 25, 150, "player", ball); 
     let fpsText = new ScreenText(0, 0, "? fps", 16, "#00FF00");
     fpsText.time = Date.now();
@@ -44,13 +46,26 @@ function populate(){
         }
         
     };
+    let scoreboard = new ScreenText(game.width/2, 0, "? - ?", 40, "#008000");
+    scoreboard.setFont("Courier");
+    scoreboard.act = function(delta){
+        let oldFont = game.context.font;
+        game.context.font = this.getFont();
+        this.txt = game.score[0]+" - "+game.score[1];
+        let width = game.context.measureText(this.txt).width;
+        this.setPos(game.width/2 - width/2, this.size);
+        game.context.font = oldFont;
+    }
+    
     
     let w1 = new Rectangle(game.width/2, game.height/2, 50, 50, "wall");
 
     
-
+    game.actors.push(goalLeft);
+    game.actors.push(goalRight);
     game.actors.push(line);
     game.actors.push(circle);
+    game.actors.push(scoreboard);
     game.actors.push(p);
     game.actors.push(bot);
     game.actors.push(fpsText);

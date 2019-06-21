@@ -19,13 +19,12 @@ export class Bot extends Player {
             return;
         }else{
             if(Math.random() < 0.001){
-                this.distracted = 1.0;
-                console.log("uh?");
+                this.distracted = 0.5;
             }
         }
         if(this.lastRandomDir <= 0){
             this.randomDir = Math.random()*1600 - 600; 
-            this.lastRandomDir = 1;
+            this.lastRandomDir = 0.25;
         }
         this.lastRandomDir -= delta;
         let center = this.getCenter();
@@ -34,7 +33,7 @@ export class Bot extends Player {
             return;
         };
         let dy = Math.pow(Math.abs(this.ball.y - this.center.y), 1);
-        let acc = (dy > this.h/2)? 600 : 600/2;
+        let acc = (dy > this.h/2)? 600 : 600*2;
         
         if(this.ball.y  > center.y){
             this.vy = Math.min(this.maxSpeed, this.vy + acc*delta);

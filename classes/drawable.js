@@ -35,7 +35,11 @@ export class Drawable {
     set y(n) {
         this.pos.y = n;
     }
-
+    
+    setPos(x, y){
+        this.pos.y = y;
+        this.pos.x = x;
+    }
     act(delta){
 
     }

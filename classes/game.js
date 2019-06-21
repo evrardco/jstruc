@@ -11,6 +11,7 @@ export class Game {
         this.t0 = this.now = Date.now();
         this.targetDelta = 16;
         this.timeScale = 1.0;
+        this.score = [0, 0];
     }
 
 }

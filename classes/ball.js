@@ -1,9 +1,26 @@
 import {Entity} from "./entity.js"
 import {game} from "../script.js"
+import { Point } from "./point.js";
 
 export class Ball extends Entity{
-    constructor(x, y, w, h, name){
+    constructor(x, y, w, h, name, vx, vy){
         super(x, y, w, h, name);
+        this.spawn = {
+            pos: new Point(x, y),
+            vel: new Point(vx, vy)
+        }
+        this.setSpeed(vx, vy);
+    }
+
+    respawn(){
+        this.setPos(this.spawn.pos.x, this.spawn.pos.y);
+        this.setSpeed(this.spawn.vel.x, this.spawn.vel.y);
+        if(Math.random() <= 0.5){
+            this.setSpeed(this.spawn.vel.x, this.spawn.vel.y);
+        }else{
+            this.setSpeed(-this.spawn.vel.x, this.spawn.vel.y);
+        }
+        
     }
     collide(){
         super.collide();
@@ -25,6 +42,11 @@ export class Ball extends Entity{
         }
     }
     collideWithOther(other){
+        if(other.name === "goal"){
+            game.score[other.team]++;
+            this.respawn();
+            return;
+        }
         let side = this.whichSide(other);
         // this.vy += other.vy;
         // this.vx += other.vx;

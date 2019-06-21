@@ -2,9 +2,10 @@ import {Drawable} from "./drawable.js"
 import {Point} from "./point.js"
 
 export class Rectangle extends Drawable {
-    constructor(x, y, w, h, name){
-        super(x, y, w, h, name);
+    constructor(x, y, w, h, name, color){
+        super(x, y, w, h, name, color);
         this.center = new Point(this.x + this.w/2, this.y+ this.h/2);
+
     }
     
 
@@ -60,7 +61,7 @@ export class Rectangle extends Drawable {
         super.draw(ctx);
         let oldFill = ctx.fillStyle;
         
-        ctx.fillStyle = "F44242";
+        ctx.fillStyle =this.color;
         ctx.fillRect(this.x, this.y, this.w, this.h);
         ctx.fillStyle = oldFill;
     }

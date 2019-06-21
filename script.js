@@ -6,6 +6,8 @@ import {Ball} from "./classes/ball.js"
 import {Rectangle} from "./classes/rectangle.js"
 import {Vector2} from "./classes/vector2.js"
 import { Bot } from "./classes/bot.js";
+import { Drawable } from "./classes/drawable.js";
+import { Circle } from "./classes/circle.js";
 
 export let game;
 
@@ -26,12 +28,13 @@ document.addEventListener('readystatechange', event => {
 
 });
 function populate(){
-    let p = new Player(25, game.height/2 - 150/2, 25, 150, "player");
-        
+    let circle = new Circle(game.width/2, game.height/2, game.width/8, "centerCircle", "#787878");
+    let line = new Rectangle(game.width/2, 0, 2, game.height, "middleLine", "#787878");    
     let ball = new Ball(game.width/2, 0, 20, 20, "ball");
+    let p = new Bot(25, game.height/2 - 150/2, 25, 150, "player", ball);
     ball.setSpeed(125, 125);    
     let bot = new Bot(game.width - 2*25, game.height/2 - 150/2, 25, 150, "player", ball); 
-    let fpsText = new ScreenText(0, 0, "? fps", 16);
+    let fpsText = new ScreenText(0, 0, "? fps", 16, "#00FF00");
     fpsText.time = Date.now();
     fpsText.act = function(delta){
         if(Date.now() - this.time >= 100){
@@ -46,7 +49,8 @@ function populate(){
 
     
 
-
+    game.actors.push(line);
+    game.actors.push(circle);
     game.actors.push(p);
     game.actors.push(bot);
     game.actors.push(fpsText);

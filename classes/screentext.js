@@ -11,7 +11,7 @@ export class ScreenText extends Drawable {
     draw(ctx){
         let oldFont = ctx.font;
         let oldFill = ctx.fillStyle;
-        ctx.fillStyle = "#00FF00";
+        ctx.fillStyle = this.color;
         ctx.font = this.size + "px Arial";
         ctx.fillText(this.txt, this.x, this.y);
         ctx.fillStyle = oldFill;

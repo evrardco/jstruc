@@ -7,6 +7,7 @@ export class Entity extends Rectangle{
         super(x, y, w, h, name);
         this.collidedList = [this.id];
         this.vel = new Vector2(0, 0);
+        this.collidable = true;
     }
 
     get vx() {
@@ -38,6 +39,7 @@ export class Entity extends Rectangle{
 
         for(let i = 0; i < game.actors.length; i++){
             let actor = game.actors[i];
+            if(!actor.collidable) continue;
             //excluding any already processed item
             if(this.collidedList.indexOf(actor.id) !== -1) continue;
             //if something is too far, it can't collide with it

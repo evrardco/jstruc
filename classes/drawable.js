@@ -4,7 +4,7 @@ var id = 0
 
 export class Drawable {
 
-    constructor(x, y, w, h, name){
+    constructor(x, y, w, h, name, color){
         this.pos = new Vector2(x, y);
         this.w = w;
         this.h = h;
@@ -12,6 +12,12 @@ export class Drawable {
         this.id = id;
         id++;
         this.length = this.w * this.w + this.h * this.h;
+        this.collidable = false;
+        if(color === undefined){
+            this.color = "F44242";
+        }else{
+            this.color = color;
+        }
     }
 
     get x() {

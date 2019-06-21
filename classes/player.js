@@ -30,25 +30,23 @@ export class Player extends Entity {
     }
 
     collideWithOther(other){
-        if(other.name === "wall"){
-            let side = this.whichSide(other);
-            switch(side){
-                case "top":
-                    this.y = other.y - this.h;
-                break;
+        let side = this.whichSide(other);
+        switch(side){
+            case "top":
+                this.y = other.y - this.h;
+            break;
 
-                case "bottom":
-                    this.y = other.y + other.h;
-                break;
+            case "bottom":
+                this.y = other.y + other.h;
+            break;
 
-                case "left":
-                    this.x = other.x - this.w;
-                break;
+            case "left":
+                this.x = other.x - this.w;
+            break;
 
-                case "right":
-                    this.x = other.x + other.w;
-                break;
-            }
+            case "right":
+                this.x = other.x + other.w;
+            break;
         }
     }
     act(delta){

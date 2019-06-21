@@ -61,7 +61,7 @@ function mainLoop(){
     }
 
     //colliding
-    for(let i = 0; i < game.actors.length; i++){
+    for(let i = game.actors.length - 1; i >= 0; i--){
         game.actors[i].collide();
     }
 

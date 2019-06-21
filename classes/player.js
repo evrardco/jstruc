@@ -1,5 +1,6 @@
 import {Entity} from "./entity.js"
 import {game} from "../script.js"
+import {Vector2} from "./vector2.js"
 
 export class Player extends Entity {
     constructor(x, y, w, h, name){
@@ -52,7 +53,7 @@ export class Player extends Entity {
     act(delta){
         super.act(delta);
 
-        this.vx = this.vy = 0;
+        this.setSpeed(0, 0);
         game.keyPressed.forEach(elem => {
             if(elem === "ArrowLeft"){
                 this.vx = -150;

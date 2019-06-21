@@ -1,10 +1,36 @@
 import {Rectangle} from "./rectangle.js"
 import {game} from "../script.js"
+import {Vector2} from "./vector2.js"
 
 export class Entity extends Rectangle{
     constructor(x, y, w, h, name){
         super(x, y, w, h, name);
         this.collidedList = [this.id];
+        this.vel = new Vector2(0, 0);
+    }
+
+    get vx() {
+        return this.vel.x;
+    }
+
+    set vx(n) {
+        this.vel.x = n;
+    }
+
+    get vy() {
+        return this.vel.y;
+    }
+
+    set vy(n) {
+        this.vel.y = n;
+    }
+
+    act(delta) {
+        this.pos.setCoords(this.pos.x + delta * this.vel.x, this.pos.y + delta * this.vel.y);
+    }
+
+    setSpeed(vx, vy){
+        this.vel.setCoords(vx, vy);
     }
 
     collide(){

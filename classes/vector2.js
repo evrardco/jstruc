@@ -42,6 +42,10 @@ export class Vector2 {
         return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
     }
 
+    dist(vector2) {
+        return Math.sqrt(Math.pow(this.x - vector2.x, 2) + Math.pow(this.y - vector2.y, 2));
+    }
+
     angle(vector2) {
         if (vector2 === undefined)
             vector2 = new Vector2(1, 0);

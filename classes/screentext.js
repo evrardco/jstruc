@@ -2,7 +2,7 @@ import {Drawable} from "./drawable.js"
 
 export class ScreenText extends Drawable {
     constructor(x, y, string, pxlSize, color){
-        super(x, y+pxlSize, pxlSize*string.length, pxlSize, "text")
+        super(x, y+pxlSize, 0, 0, "text")
         this.size = pxlSize;
         this.txt = string;
         this.color = color;

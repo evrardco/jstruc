@@ -70,9 +70,8 @@ function mainLoop(){
     for(let i = 0; i < game.actors.length; i++){
         game.actors[i].draw(game.context);
     }
+    window.requestAnimationFrame(mainLoop);
 
-    let lastKey = undefined;
-    setTimeout(mainLoop, game.targetDelta);
 }
 
 function keyDispatch(event){

@@ -1,38 +1,48 @@
+import { Vector2 } from "./vector2.js";
+
 var id = 0
 
 export class Drawable {
 
     constructor(x, y, w, h, name){
-        this.x = x;
-        this.y = y;
+        this.pos = new Vector2(x, y);
         this.w = w;
         this.h = h;
-        this.vx = 0.0;
-        this.vy = 0.0;
         this.name = name;
         this.id = id;
         id++;
-        this.length = this.w*this.w + this.h*this.h;
+        this.length = this.w * this.w + this.h * this.h;
     }
-    setSpeed(vx, vy){
-        this.vx = vx;
-        this.vy = vy;
+
+    get x() {
+        return this.pos.x;
+    }
+
+    set x(n) {
+        this.pos.x = n;
+    }
+
+    get y() {
+        return this.pos.y;
+    }
+
+    set y(n) {
+        this.pos.y = n;
     }
 
     act(delta){
-        this.x = this.x + delta * this.vx;
-        this.y = this.y + delta * this.vy;
-    }
-
-    collide(){
 
     }
 
     draw(ctx){
 
     }
+
+    collide(){
+
+    }
     
-    distance(other){
-        return dist(this.x, this.y, other.x, other.y);
+    distance(vector2){
+        return this.pos.dist(vector2);
     }
 }

@@ -20,6 +20,12 @@ document.addEventListener('readystatechange', event => {
 
     if (event.target.readyState === "complete") {
         //Now external resources are loaded too, like css,src etc... 
+        var socket = io("http://localhost:4004");
+        //Now we can listen for that event
+        socket.on('onconnected', function( data ) {
+                //Note that the data is the object we sent from the server, as is. So we can assume its id exists. 
+            console.log( 'Connected successfully to the socket.io server. My server side ID is ' + data.id );
+        });
         init();
         populate();
         mainLoop();

@@ -33,8 +33,8 @@ function populate(){
     let goalRight = new Goal(game.width - 25, 0, 25, game.height, "goal", 0);
     let circle = new Circle(game.width/2, game.height/2, game.width/8, "centerCircle", "#787878");
     let line = new Rectangle(game.width/2, 0, 2, game.height, "middleLine", "#787878");    
-    let ball = new Ball(game.width/2, 0, 20, 20, "ball", 125, 125);
-    let p = new Bot(25, game.height/2 - 150/2, 25, 150, "player", ball);
+    let ball = new Ball(game.width/2, 0, 20, 20, "ball", 500, 500);
+    let p = new Player(25, game.height/2 - 150/2, 25, 150, "player", ball);
     let bot = new Bot(game.width - 2*25, game.height/2 - 150/2, 25, 150, "player", ball); 
     let fpsText = new ScreenText(0, 0, "? fps", 16, "#00FF00");
     fpsText.time = Date.now();

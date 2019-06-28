@@ -3,10 +3,16 @@ import {game} from "../script.js"
 import {Vector2} from "./vector2.js"
 
 export class Player extends Entity {
-    constructor(x, y, w, h, name){
+    constructor(x, y, w, h, name, keyMap){
         super(x, y, w, h, name);
         this.acc = 3000;
         this.maxSpeed = 6000;
+        this.keyMap = keyMap;
+        if(keyMap === undefined){
+            this.keyMap = game.defaultKeyMap;
+        }else{
+            this.keyMap = keyMap;
+        }
     }
 
     collide(){
@@ -52,20 +58,23 @@ export class Player extends Entity {
     }
     act(delta){
         super.act(delta);
-
-        this.setSpeed(0, 0);
+        if(game.other.id !== this.id)
+            this.setSpeed(0, 0);
         game.keyPressed.forEach(elem => {
-            if(elem === "ArrowLeft"){
+            if(elem === this.keyMap[0]){
                 this.vx = -150;
             } 
-            if(elem === "ArrowRight"){
+            if(elem === this.keyMap[1]){
                 this.vx = 150;
             } 
-            if(elem === "ArrowDown"){
+            if(elem === this.keyMap[2]){
                 this.vy = 150;
             }
-            if(elem === "ArrowUp"){
+            if(elem === this.keyMap[3]){
                 this.vy = -150;
+            }
+            if(elem === "d"){
+                game.socket.disconnect();
             }
         });
 

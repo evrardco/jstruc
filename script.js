@@ -20,28 +20,49 @@ document.addEventListener('readystatechange', event => {
 
     if (event.target.readyState === "complete") {
         //Now external resources are loaded too, like css,src etc... 
-        var socket = io("http://localhost:4004");
-        //Now we can listen for that event
-        socket.on('onconnected', function( data ) {
-                //Note that the data is the object we sent from the server, as is. So we can assume its id exists. 
-            console.log( 'Connected successfully to the socket.io server. My server side ID is ' + data.id );
-        });
-        init();
-        populate();
-        mainLoop();
+
+        startup();
         //document.getElementById('game').addEventListener('keypress', handleKeyPress);
         
     }
 
 });
+
+export function startup(){
+    init();
+    populate();
+}
+
+function init(){
+    game = new Game();
+    window.addEventListener("keydown", keyDispatch);
+    window.addEventListener("keyup", keyRemove);
+    game.socket = io("http://192.168.1.28:4004");
+    //Now we can listen for that event
+    game.socket.on('onconnected', function( data ) {
+            //Note that the data is the object we sent from the server, as is. So we can assume its id exists. 
+        console.log( 'Connected successfully to the socket.io server. My server side ID is ' + data.id );
+    });
+    game.socket.on("update", updateHandler);
+}
+
+function updateHandler(data){
+    let toUpdate = (data.type === "player") ? game.other : game.ball;
+    toUpdate.x = data.pos.x;
+    toUpdate.y = data.pos.y;
+
+    toUpdate.vx = data.vel.x;
+    toUpdate.vy = data.vel.y;
+}
+
 function populate(){
     let goalLeft = new Goal(0, 0, 25, game.height, "goal", 1);
     let goalRight = new Goal(game.width - 25, 0, 25, game.height, "goal", 0);
     let circle = new Circle(game.width/2, game.height/2, game.width/8, "centerCircle", "#787878");
     let line = new Rectangle(game.width/2, 0, 2, game.height, "middleLine", "#787878");    
-    let ball = new Ball(game.width/2, 0, 20, 20, "ball", 500, 500);
-    let p = new Player(25, game.height/2 - 150/2, 25, 150, "player", ball);
-    let bot = new Bot(game.width - 2*25, game.height/2 - 150/2, 25, 150, "player", ball); 
+    let ball = new Ball(game.width/2, 0, 20, 20, "ball", 250, 250);
+    game.ball = ball;
+    
     let fpsText = new ScreenText(0, 0, "? fps", 16, "#00FF00");
     fpsText.time = Date.now();
     fpsText.act = function(delta){
@@ -64,26 +85,54 @@ function populate(){
     }
     
     
-    let w1 = new Rectangle(game.width/2, game.height/2, 50, 50, "wall");
-
     
+    let right = new Player(game.width - 2*25, game.height/2 - 150/2, 25, 150, "player", ["", "", "", ""]);
+    let left = new Player(25, game.height/2 - 150/2, 25, 150, "player", ["", "", "", ""]);
+    let other;
+    //networking
+    game.socket.on("left", function(){
+        console.log("You are the player on the left");
+        game.side = "left";
+        game.actors.push(left);
+        left.keyMap = game.defaultKeyMap;
+        game.other = right;
+        game.player = left;
+    });
+
+    game.socket.on("right", function(){
+        console.log("You are the player on the right");
+        game.side = "right";
+        game.actors.push(left);
+        
+        right.keyMap = game.defaultKeyMap;
+        game.other = left;
+        game.player = right;
+        game.socket.emit("start");
+    });
+
+    game.socket.on("ready", function(){
+        console.log("The game is ready.");
+        
+        game.actors.push(right);
+        game.actors.push(ball);
+        mainLoop();
+    });
+
     game.actors.push(goalLeft);
     game.actors.push(goalRight);
     game.actors.push(line);
     game.actors.push(circle);
     game.actors.push(scoreboard);
-    game.actors.push(p);
-    game.actors.push(bot);
     game.actors.push(fpsText);
+    
+
+    
+    
     //game.actors.push(w1);
-    game.actors.push(ball);
 }
-function init(){
-    game = new Game();
-    window.addEventListener("keydown", keyDispatch);
-    window.addEventListener("keyup", keyRemove);
-}
+
 function mainLoop(){
+
     game.last = game.now;
     game.now = Date.now();
 
@@ -102,6 +151,32 @@ function mainLoop(){
     for(let i = 0; i < game.actors.length; i++){
         game.actors[i].draw(game.context);
     }
+
+    game.socket.emit("update", {
+        type: "player", 
+        pos: {
+            x: game.player.x,
+            y: game.player.y
+        },
+        vel: {
+            x: game.player.vx,
+            y: game.player.vy
+        },
+    });
+    if(game.side === "left"){
+        game.socket.emit("update", {
+            type: "ball", 
+            pos: {
+                x: game.ball.x,
+                y: game.ball.y
+            },
+            vel: {
+                x: game.ball.vx,
+                y: game.ball.vy
+            },
+        });
+    }
+
     window.requestAnimationFrame(mainLoop);
 
 }

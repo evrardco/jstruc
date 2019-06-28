@@ -68,11 +68,29 @@ sio.use(function(socket, next) {
     next();
 });
 
+
+
+var p1 = undefined;
+var p2 = undefined;
 //Socket.io will call this function when a client connects, 
 //So we can send that client a unique ID we use so we can 
 //maintain the list of players.
 sio.sockets.on('connection', function (client) {
-
+    if(p1 === undefined){
+        p1 = client;
+        client.emit("left");
+        console.log("Left player connected.");
+    }else{
+        if(p2 === undefined){
+            p2 = client;
+            client.emit("right");
+            
+            console.log("Right player connected.");
+        }else{
+            client.emit('disconnect', {reason: 'server full.'});
+            
+        }
+    }
     //Generate a new UUID, looks something like 
     //5b2ca132-64bd-4513-99da-90e838ca47d1
     //and store this on their socket/connection
@@ -83,13 +101,34 @@ sio.sockets.on('connection', function (client) {
 
         //Useful to know when someone connects
     console.log('\t socket.io:: player ' + client.userid + ' connected');
-
+    
         //When this client disconnects
     client.on('disconnect', function () {
 
             //Useful to know when someone disconnects
         console.log('\t socket.io:: client disconnected ' + client.userid );
+        client.broadcast.emit("gameover");
+        if(client === p1 && p2 !== undefined){
+            p2.disconnect();
+        }else{
+            p1.disconnect();
+        }
+        p1 = p2 = undefined;
 
-    }); //client.on disconnect
+    });
+    client.on('update', function(data){
+        console.log("updating, other: "+client.other);
+        if(client.other === undefined) return;
+        client.other.emit('update', data);
+        
+    }) //client.on disconnect
+
+    client.on('start', function(data){
+        console.log("Right told us to start, let's go !");
+        p2.emit("ready");
+        p1.emit("ready");
+        p1.other = p2;
+        p2.other = p1;
+    });
 
 }); //sio.sockets.on connection

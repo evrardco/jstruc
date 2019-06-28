@@ -1,3 +1,4 @@
+
 export class Game {
 
     constructor(){
@@ -12,6 +13,14 @@ export class Game {
         this.targetDelta = 16;
         this.timeScale = 1.0;
         this.score = [0, 0];
+        this.playerId = undefined;
+        this.side = undefined // "left" | "right", used in multiplayer.
+        this.socket = undefined;
+        this.defaultKeyMap = ["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp"];
+        this.other = undefined;
+        this.player = undefined;
+        this.ready = false;
+        this.ball = undefined;
     }
 
 }

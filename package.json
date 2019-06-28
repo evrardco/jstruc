@@ -1,0 +1,26 @@
+{
+  "name": "jstruc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/evrardco/jstruc.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/evrardco/jstruc/issues"
+  },
+  "homepage": "https://github.com/evrardco/jstruc#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "node-uuid": "^1.4.8",
+    "socket.io": "^2.2.0",
+    "socket.io-client": "^2.2.0"
+  }
+}

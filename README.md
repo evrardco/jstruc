@@ -1,5 +1,5 @@
-#JSTRUC
-##/QA
+# JSTRUC
+## Q/A
 ### What is it?
 Jstruc is an embryo of a javascript in browser game engine. It currently supports delta time, basic shapes and basic collisions (aabb collisions, don't hit the corners).
 ### Is it really a game engine, though?
@@ -10,7 +10,7 @@ It's a basic gameserver, this whole repos was a test for me to try and succeed (
 ### How can I test this?
 Currently, you can clone the repo, and launch npm install . within. It should install all the dependencies for you. You should also modify the ip address in the beginning of script.js to yours (local address if you're testing in local).
 
-##TODO
+## TODO
 1. Center score;
 2. red lines for the goals;
 3. aabb segment intersection for precise collisions;

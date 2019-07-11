@@ -37,7 +37,7 @@ function init(){
     game = new Game();
     window.addEventListener("keydown", keyDispatch);
     window.addEventListener("keyup", keyRemove);
-    game.socket = io("http://192.168.1.28:4004");
+    game.socket = io("http://192.168.1.28:8080");
     //Now we can listen for that event
     game.socket.on('onconnected', function( data ) {
             //Note that the data is the object we sent from the server, as is. So we can assume its id exists. 

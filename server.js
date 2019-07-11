@@ -7,7 +7,7 @@
 */
 
 var 
-gameport        = process.env.PORT || 4004,
+gameport        = process.env.PORT || 8080,
 
 
 express         = require('express'),
@@ -28,7 +28,7 @@ var http = require('http').createServer(app)
 var sio = require('socket.io')(http);
 
 
-http.listen( gameport );
+http.listen(gameport);
 
 
 //Log something so we know that it succeeded.

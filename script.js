@@ -35,15 +35,22 @@ export function startup(){
 
 function init(){
     game = new Game();
+    game.local = true;
     window.addEventListener("keydown", keyDispatch);
     window.addEventListener("keyup", keyRemove);
-    game.socket = io("http://192.168.1.28:8080");
-    //Now we can listen for that event
-    game.socket.on('onconnected', function( data ) {
-            //Note that the data is the object we sent from the server, as is. So we can assume its id exists. 
-        console.log( 'Connected successfully to the socket.io server. My server side ID is ' + data.id );
-    });
-    game.socket.on("update", updateHandler);
+
+    if(!game.local){
+        game.socket = io("http://192.168.1.28:8080");
+        //Now we can listen for that event
+        game.socket.on('onconnected', function( data ) {
+                //Note that the data is the object we sent from the server, as is. So we can assume its id exists. 
+            console.log( 'Connected successfully to the socket.io server. My server side ID is ' + data.id );
+        });
+        game.socket.on("update", updateHandler);
+    }
+
+
+
 }
 
 function updateHandler(data){
@@ -87,48 +94,70 @@ function populate(){
     
     
     let right = new Player(game.width - 2*25, game.height/2 - 150/2, 25, 150, "player", ["", "", "", ""]);
-    let left = new Player(25, game.height/2 - 150/2, 25, 150, "player", ["", "", "", ""]);
-    let other;
-    //networking
-    game.socket.on("left", function(){
-        console.log("You are the player on the left");
-        game.side = "left";
-        game.actors.push(left);
-        left.keyMap = game.defaultKeyMap;
-        game.other = right;
-        game.player = left;
-    });
+    let left;
 
-    game.socket.on("right", function(){
-        console.log("You are the player on the right");
-        game.side = "right";
-        game.actors.push(left);
-        
-        right.keyMap = game.defaultKeyMap;
+    if(game.local){
+        //game in local mode
+        left = new Bot(25, game.height/2 - 150/2, 25, 150, "bot", ball);
         game.other = left;
         game.player = right;
-        game.socket.emit("start");
-    });
 
-    game.socket.on("ready", function(){
-        console.log("The game is ready.");
-        
+        game.actors.push(left);
         game.actors.push(right);
+        game.actors.push(scoreboard);
+        game.actors.push(scoreboard);
+        game.actors.push(fpsText);
         game.actors.push(ball);
+        game.actors.push(line);
+        game.actors.push(circle);
+        game.actors.push(goalLeft);
+        game.actors.push(goalRight);
+
         mainLoop();
-    });
+        
+    } else {
+        
 
-    game.actors.push(goalLeft);
-    game.actors.push(goalRight);
-    game.actors.push(line);
-    game.actors.push(circle);
-    game.actors.push(scoreboard);
-    game.actors.push(fpsText);
-    
+        left = new Player(25, game.height/2 - 150/2, 25, 150, "player", ["", "", "", ""]);
+        let other;
+        //networking
+        game.socket.on("left", function(){
+            console.log("You are the player on the left");
+            game.side = "left";
+            game.actors.push(left);
+            left.keyMap = game.defaultKeyMap;
+            game.other = right;
+            game.player = left;
+        });
 
+        game.socket.on("right", function(){
+            console.log("You are the player on the right");
+            game.side = "right";
+            game.actors.push(left);
+            
+            right.keyMap = game.defaultKeyMap;
+            game.other = left;
+            game.player = right;
+            game.socket.emit("start");
+        });
+
+        game.socket.on("ready", function(){
+            console.log("The game is ready.");
+            
+            game.actors.push(right);
+            game.actors.push(ball);
+            mainLoop();
+        });
+
+        game.actors.push(goalLeft);
+        game.actors.push(goalRight);
+        game.actors.push(line);
+        game.actors.push(circle);
+        game.actors.push(scoreboard);
+        game.actors.push(fpsText);
+
+    }
     
-    
-    //game.actors.push(w1);
 }
 
 function mainLoop(){
@@ -138,6 +167,7 @@ function mainLoop(){
 
     //acting
     for(let i = 0; i < game.actors.length; i++){
+        console.log("iterating through: " + game.actors[i].name);
         game.actors[i].act(game.timeScale * (game.now - game.last) / 1000);
     }
 
@@ -151,31 +181,34 @@ function mainLoop(){
     for(let i = 0; i < game.actors.length; i++){
         game.actors[i].draw(game.context);
     }
-
-    game.socket.emit("update", {
-        type: "player", 
-        pos: {
-            x: game.player.x,
-            y: game.player.y
-        },
-        vel: {
-            x: game.player.vx,
-            y: game.player.vy
-        },
-    });
-    if(game.side === "left"){
+    
+    if(!game.local){
         game.socket.emit("update", {
-            type: "ball", 
+            type: "player", 
             pos: {
-                x: game.ball.x,
-                y: game.ball.y
+                x: game.player.x,
+                y: game.player.y
             },
             vel: {
-                x: game.ball.vx,
-                y: game.ball.vy
+                x: game.player.vx,
+                y: game.player.vy
             },
         });
+        if(game.side === "left"){
+            game.socket.emit("update", {
+                type: "ball", 
+                pos: {
+                    x: game.ball.x,
+                    y: game.ball.y
+                },
+                vel: {
+                    x: game.ball.vx,
+                    y: game.ball.vy
+                },
+            });
+        }
     }
+    
 
     window.requestAnimationFrame(mainLoop);
 

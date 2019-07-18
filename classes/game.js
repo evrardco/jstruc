@@ -21,6 +21,7 @@ export class Game {
         this.player = undefined;
         this.ready = false;
         this.ball = undefined;
+        this.local = true;
     }
 
 }

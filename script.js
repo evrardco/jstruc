@@ -9,6 +9,7 @@ import { Bot } from "./classes/bot.js";
 import { Drawable } from "./classes/drawable.js";
 import { Circle } from "./classes/circle.js";
 import { Goal } from "./classes/goal.js";
+import { pong } from "./scenarios/tests/pong.js"
 
 export let game;
 
@@ -30,11 +31,14 @@ document.addEventListener('readystatechange', event => {
 
 export function startup(){
     init();
-    populate();
+    game.scenario.populate();
+    launch();
 }
 
 function init(){
+    
     game = new Game();
+    game.scenario = pong;
     game.local = true;
     window.addEventListener("keydown", keyDispatch);
     window.addEventListener("keyup", keyRemove);
@@ -62,102 +66,16 @@ function updateHandler(data){
     toUpdate.vy = data.vel.y;
 }
 
-function populate(){
-    let goalLeft = new Goal(0, 0, 25, game.height, "goal", 1);
-    let goalRight = new Goal(game.width - 25, 0, 25, game.height, "goal", 0);
-    let circle = new Circle(game.width/2, game.height/2, game.width/8, "centerCircle", "#787878");
-    let line = new Rectangle(game.width/2, 0, 2, game.height, "middleLine", "#787878");    
-    let ball = new Ball(game.width/2, 0, 20, 20, "ball", 250, 250);
-    game.ball = ball;
-    
-    let fpsText = new ScreenText(0, 0, "? fps", 16, "#00FF00");
-    fpsText.time = Date.now();
-    fpsText.act = function(delta){
-        if(Date.now() - this.time >= 100){
-            this.time = Date.now();
-            let fps = 1/delta;
-            this.txt = Math.round(fps)+" fps";
-        }
-        
-    };
-    let scoreboard = new ScreenText(game.width/2, 0, "? - ?", 40, "#008000");
-    scoreboard.setFont("Courier");
-    scoreboard.act = function(delta){
-        let oldFont = game.context.font;
-        game.context.font = this.getFont();
-        this.txt = game.score[0]+" - "+game.score[1];
-        let width = game.context.measureText(this.txt).width;
-        this.setPos(game.width/2 - width/2, this.size);
-        game.context.font = oldFont;
-    }
-    
-    
-    
-    let right = new Player(game.width - 2*25, game.height/2 - 150/2, 25, 150, "player", ["", "", "", ""]);
-    let left;
 
-    if(game.local){
-        //game in local mode
-        left = new Bot(25, game.height/2 - 150/2, 25, 150, "bot", ball);
-        game.other = left;
-        game.player = right;
-
-        game.actors.push(left);
-        game.actors.push(right);
-        game.actors.push(scoreboard);
-        game.actors.push(scoreboard);
-        game.actors.push(fpsText);
-        game.actors.push(ball);
-        game.actors.push(line);
-        game.actors.push(circle);
-        game.actors.push(goalLeft);
-        game.actors.push(goalRight);
-
-        mainLoop();
-        
-    } else {
-        
-
-        left = new Player(25, game.height/2 - 150/2, 25, 150, "player", ["", "", "", ""]);
-        let other;
-        //networking
-        game.socket.on("left", function(){
-            console.log("You are the player on the left");
-            game.side = "left";
-            game.actors.push(left);
-            left.keyMap = game.defaultKeyMap;
-            game.other = right;
-            game.player = left;
-        });
-
-        game.socket.on("right", function(){
-            console.log("You are the player on the right");
-            game.side = "right";
-            game.actors.push(left);
-            
-            right.keyMap = game.defaultKeyMap;
-            game.other = left;
-            game.player = right;
-            game.socket.emit("start");
-        });
-
+function launch(){
+    if(!game.local){
         game.socket.on("ready", function(){
-            console.log("The game is ready.");
-            
-            game.actors.push(right);
-            game.actors.push(ball);
+            console.log("The game is ready."); 
             mainLoop();
         });
-
-        game.actors.push(goalLeft);
-        game.actors.push(goalRight);
-        game.actors.push(line);
-        game.actors.push(circle);
-        game.actors.push(scoreboard);
-        game.actors.push(fpsText);
-
+    }else{
+        mainLoop();
     }
-    
 }
 
 function mainLoop(){
@@ -167,7 +85,7 @@ function mainLoop(){
 
     //acting
     for(let i = 0; i < game.actors.length; i++){
-        console.log("iterating through: " + game.actors[i].name);
+        // console.log("iterating through: " + game.actors[i].name);
         game.actors[i].act(game.timeScale * (game.now - game.last) / 1000);
     }
 
@@ -183,30 +101,7 @@ function mainLoop(){
     }
     
     if(!game.local){
-        game.socket.emit("update", {
-            type: "player", 
-            pos: {
-                x: game.player.x,
-                y: game.player.y
-            },
-            vel: {
-                x: game.player.vx,
-                y: game.player.vy
-            },
-        });
-        if(game.side === "left"){
-            game.socket.emit("update", {
-                type: "ball", 
-                pos: {
-                    x: game.ball.x,
-                    y: game.ball.y
-                },
-                vel: {
-                    x: game.ball.vx,
-                    y: game.ball.vy
-                },
-            });
-        }
+       game.scenario.synchronize();
     }
     
 

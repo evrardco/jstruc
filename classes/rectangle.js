@@ -1,10 +1,15 @@
 import {Drawable} from "./drawable.js"
 import {Point} from "./point.js"
+import {game} from "../script.js"
+
+
 
 export class Rectangle extends Drawable {
     constructor(x, y, w, h, name, color){
         super(x, y, w, h, name, color);
         this.center = new Point(this.x + this.w/2, this.y+ this.h/2);
+        this.full = true;
+        this.singleFrame = false; 
 
     }
     
@@ -27,7 +32,10 @@ export class Rectangle extends Drawable {
         let w = Math.min(this.x + this.w, rect.x + rect.w) - x;
         let y = Math.max(this.y, rect.y);
         let h = Math.min(this.y + this.h, rect.y + rect.h) - y;
-        return new Rectangle(x, y, w, h, "intersector");
+        let ret = new Rectangle(x, y, w, h, "intersector");
+        ret.color = 'red';
+        
+        return ret; 
     }
 
     whichSide(r2){
@@ -39,7 +47,7 @@ export class Rectangle extends Drawable {
         var crossHeight = height*dx;
         var collision = 'none';
         //
-        if(Math.abs(dx)<=width && Math.abs(dy)<=height){
+        if(Math.abs(dx)<width && Math.abs(dy)<height){
           if(crossWidth>crossHeight){
             collision=(crossWidth > -crossHeight)?'bottom':'left';
           }else{
@@ -59,11 +67,22 @@ export class Rectangle extends Drawable {
 
     draw(ctx){
         super.draw(ctx);
-        let oldFill = ctx.fillStyle;
-        
-        ctx.fillStyle =this.color;
-        ctx.fillRect(this.x, this.y, this.w, this.h);
-        ctx.fillStyle = oldFill;
+        if(this.full){
+            let oldFill = ctx.fillStyle;
+            ctx.fillStyle =this.color;
+            ctx.fillRect(this.x, this.y, this.w, this.h);
+            ctx.fillStyle = oldFill;
+        }else {
+            let oldStroke = ctx.strokeStyle;
+            ctx.strokeStyle =this.color;
+            ctx.strokeRect(this.x, this.y, this.w, this.h);
+            ctx.strokestyle = oldStroke;
+        }
+
+        if(this.singleFrame){
+            this.remove();
+        }
+
     }
 
 

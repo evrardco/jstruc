@@ -55,6 +55,10 @@ export class Entity extends Rectangle{
     }
 
     collideWithOther(other){
-
+        if(game.debugCollisions){
+            let inter = this.getIntersection(other);
+            inter.singleFrame = true;
+            game.actors.push(inter);
+        }
     }
 }

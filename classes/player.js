@@ -8,6 +8,7 @@ export class Player extends Entity {
         this.acc = 3000;
         this.maxSpeed = 6000;
         this.keyMap = keyMap;
+        this.lastSide = new Object();// used to keep the result of the last collision
         if(keyMap === undefined){
             this.keyMap = game.defaultKeyMap;
         }else{
@@ -58,8 +59,7 @@ export class Player extends Entity {
     }
     act(delta){
         super.act(delta);
-        if(game.other.id !== this.id)
-            this.setSpeed(0, 0);
+        this.setSpeed(0, 0);
         game.keyPressed.forEach(elem => {
             if(elem === this.keyMap[0]){
                 this.vx = -150;

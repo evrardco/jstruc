@@ -10,6 +10,8 @@ import { Drawable } from "./classes/drawable.js";
 import { Circle } from "./classes/circle.js";
 import { Goal } from "./classes/goal.js";
 import { pong } from "./scenarios/tests/pong.js"
+import { collisions } from "./scenarios/tests/collision_test.js"
+
 
 export let game;
 
@@ -38,7 +40,7 @@ export function startup(){
 function init(){
     
     game = new Game();
-    game.scenario = pong;
+    game.scenario = collisions;
     game.local = true;
     window.addEventListener("keydown", keyDispatch);
     window.addEventListener("keyup", keyRemove);
@@ -104,7 +106,7 @@ function mainLoop(){
        game.scenario.synchronize();
     }
     
-
+    game.tickNumber++;
     window.requestAnimationFrame(mainLoop);
 
 }

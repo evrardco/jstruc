@@ -1,4 +1,5 @@
 import { Vector2 } from "./vector2.js";
+import { game } from "../script.js";
 
 var id = 0
 
@@ -54,5 +55,10 @@ export class Drawable {
     
     distance(vector2){
         return this.pos.dist(vector2);
+    }
+
+    remove(){
+        var id = this.id;
+        game.actors = game.actors.filter(function(value, index, array){return value.id !== id});
     }
 }

@@ -22,6 +22,8 @@ export class Game {
         this.ready = false;
         this.ball = undefined;
         this.local = true;
+        this.tickNumber = 0;
+        this.debugCollisions = false;
     }
 
 }

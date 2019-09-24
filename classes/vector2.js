@@ -64,5 +64,43 @@ export class Vector2 {
         this.x /= len;
         this.y /= len;
     }
+    
+    slope(){
+        return this.y/this.x
+    }
+    /**
+     * traces a ray from this vector's position to an infinite line aligned to the y axis
+     * according to dir's direction.
+     * returns the x coordinate where the ray intersects the line.
+     * @param {vector2} dir 
+     * @param {real} lineY coordinate Y of the AA line
+     */
+    raycastYAA(dir, lineY){
+        // we're going with the equation y = mx + p
+        // first find m
+        let m = dir.slope();
+        // let's find p
+        let p = this.y - m*this.x;
+        return (lineY - p)/m;
+
+    }
+        /**
+     * traces a ray from this vector's position to an infinite line aligned to the x axis
+     * according to dir's direction.
+     * returns the y coordinate where the ray intersects the line.
+     * @param {vector2} dir 
+     * @param {real} lineX coordinate Y of the AA line
+     */
+    raycastXAA(dir, lineX){
+        // we're going with the equation y = mx + p
+        // first find m
+        let m = dir.slope();
+        // let's find p
+        let p = this.y - m*this.x;
+        return m*lineX + p;
+    }
+    raycastRectAA(dir, rect){
+        //TODO
+    }
 
 }

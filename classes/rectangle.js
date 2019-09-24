@@ -1,13 +1,12 @@
 import {Drawable} from "./drawable.js"
-import {Point} from "./point.js"
-import {game} from "../script.js"
+import { Vector2 } from "./vector2.js";
 
 
 
 export class Rectangle extends Drawable {
     constructor(x, y, w, h, name, color){
         super(x, y, w, h, name, color);
-        this.center = new Point(this.x + this.w/2, this.y+ this.h/2);
+        this.center = new Vector2(this.x + this.w/2, this.y+ this.h/2);
         this.full = true;
         this.singleFrame = false; 
 
@@ -15,15 +14,15 @@ export class Rectangle extends Drawable {
     
 
     getCenter(){
-        return new Point(this.x + this.w/2, this.y+ this.h/2);
+        return new Vector2(this.x + this.w/2, this.y+ this.h/2);
     }
 
     getCorners(){
         return {
-            topLeft:        new Point(this.x            , this.y),
-            topRight:       new Point(this.x + this.w   , this.y),
-            bottomRight:    new Point(this.x + this.w   , this.y + this.h),
-            bottomLeft:     new Point(this.x            , this.y + this.h)
+            topLeft:        new Vector2(this.x            , this.y),
+            topRight:       new Vector2(this.x + this.w   , this.y),
+            bottomRight:    new Vector2(this.x + this.w   , this.y + this.h),
+            bottomLeft:     new Vector2(this.x            , this.y + this.h)
         };
     }
 
@@ -38,6 +37,15 @@ export class Rectangle extends Drawable {
         return ret; 
     }
 
+    whichCorner(r2){
+        
+
+    }
+    /**
+     * Side collision method, buggy with disproportionate rectangles but faster.
+     * returns which side is colliding with r2.
+     * @param {*} r2 other rectangles to collide with.
+     */
     whichSide(r2){
         var dx = (this.x + this.w/2) - (r2.x + r2.w/2);
         var dy = (this.y + this.h/2) - (r2.y + r2.h/2);

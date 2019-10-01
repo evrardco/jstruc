@@ -8,6 +8,9 @@ export class Entity extends Rectangle{
         this.collidedList = [this.id];
         this.vel = new Vector2(0, 0);
         this.collidable = true;
+        this.previousPos = new Vector2(0, 0);
+        this.lastDelta = 0;
+
     }
 
     get vx() {
@@ -27,7 +30,9 @@ export class Entity extends Rectangle{
     }
 
     act(delta) {
+        this.previousPos.setCoords(this.pos.x, this.pos.y);
         this.pos.setCoords(this.pos.x + delta * this.vel.x, this.pos.y + delta * this.vel.y);
+        this.lastDelta = delta;
     }
 
     setSpeed(vx, vy){
@@ -49,16 +54,46 @@ export class Entity extends Rectangle{
             }
             //if(actor.name === "ground" && this.onGround) continue;
             if(this.intersects(actor)){
+                actor.collidedList.push(this.id);
                 this.collideWithOther(actor);
             }
         }
     }
 
     collideWithOther(other){
-        if(game.debugCollisions){
-            let inter = this.getIntersection(other);
-            inter.singleFrame = true;
-            game.actors.push(inter);
+
+        this.getCollisionSide(other)
+    }
+    /**
+     * the actor with which the entity just collided
+     * returns which side collided first.
+     * @param {Actor} other 
+     */
+    getCollisionSide(other){
+
+        let velx = this.vel.x;
+        let vely = this.vel.y;
+        
+        //checking along x axis
+        let xRect = new Rectangle(this.previousPos.x + this.lastDelta * velx, this.previousPos.y, this.w, this.h);
+        let yRect = new Rectangle(this.previousPos.x, this.previousPos.y + this.lastDelta * vely, this.w, this.h);
+        if(xRect.intersects(other)){
+            //collision alongside x detected
+            if(this.previousPos.x < other.x){
+                return 'left';
+            }else{
+                return 'right';
+            }
         }
+        if(yRect.intersects(other)){
+            //collision alongside y detected
+            if(this.previousPos.y < other.y){
+                return 'top';
+            }else{
+                return 'bottom';
+            }
+        }
+        
+
     }
 }

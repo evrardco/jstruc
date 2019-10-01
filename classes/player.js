@@ -1,6 +1,5 @@
 import {Entity} from "./entity.js"
 import {game} from "../script.js"
-import {Vector2} from "./vector2.js"
 
 export class Player extends Entity {
     constructor(x, y, w, h, name, keyMap){
@@ -38,27 +37,27 @@ export class Player extends Entity {
     }
 
     collideWithOther(other){
-        let side = this.whichSide(other);
+        let side = this.getCollisionSide(other);
         switch(side){
             case "top":
-                this.y = other.y - this.h;
+                this.y = other.y - this.h - 2;
             break;
 
             case "bottom":
-                this.y = other.y + other.h;
+                this.y = other.y + other.h + 2;
             break;
 
             case "left":
-                this.x = other.x - this.w;
+                this.x = other.x - this.w - 2;
             break;
 
             case "right":
-                this.x = other.x + other.w;
+                this.x = other.x + other.w + 2;
             break;
         }
+
     }
     act(delta){
-        super.act(delta);
         this.setSpeed(0, 0);
         game.keyPressed.forEach(elem => {
             if(elem === this.keyMap[0]){
@@ -77,6 +76,9 @@ export class Player extends Entity {
                 game.socket.disconnect();
             }
         });
+
+        super.act(delta);
+
 
     }
 }

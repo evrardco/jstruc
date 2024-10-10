@@ -1,11 +1,11 @@
 import {Entity} from "./entity.js"
 import {game} from "../script.js"
-
+const v_vel = 450
 export class Player extends Entity {
     constructor(x, y, w, h, name, keyMap){
         super(x, y, w, h, name);
-        this.acc = 3000;
-        this.maxSpeed = 6000;
+        this.acc = 6000;
+        this.maxSpeed = 12000;
         this.keyMap = keyMap;
         this.lastSide = new Object();// used to keep the result of the last collision
         if(keyMap === undefined){
@@ -55,22 +55,25 @@ export class Player extends Entity {
                 this.x = other.x + other.w + 2;
             break;
         }
+        //players are not supposed to collide with each other, accelerate the ball
+        other.vx *= 1.10
+        other.vy *= 1.10
 
     }
     act(delta){
         this.setSpeed(0, 0);
         game.keyPressed.forEach(elem => {
             if(elem === this.keyMap[0]){
-                this.vx = -150;
+                this.vx = 0; //disable horizontal movement
             } 
             if(elem === this.keyMap[1]){
-                this.vx = 150;
+                this.vx = 0; //disable horizontal movement
             } 
             if(elem === this.keyMap[2]){
-                this.vy = 150;
+                this.vy = v_vel;
             }
             if(elem === this.keyMap[3]){
-                this.vy = -150;
+                this.vy = -v_vel;
             }
             if(elem === "d"){
                 game.socket.disconnect();

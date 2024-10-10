@@ -40,19 +40,20 @@ export function startup(){
 function init(){
     
     game = new Game();
-    game.scenario = collisions;
-    game.local = true;
+    game.scenario = pong;
+    game.local = false;
     window.addEventListener("keydown", keyDispatch);
     window.addEventListener("keyup", keyRemove);
 
     if(!game.local){
-        game.socket = io("http://192.168.1.28:8080");
+        game.socket = io("http://192.168.0.239:8080");
         //Now we can listen for that event
         game.socket.on('onconnected', function( data ) {
                 //Note that the data is the object we sent from the server, as is. So we can assume its id exists. 
             console.log( 'Connected successfully to the socket.io server. My server side ID is ' + data.id );
         });
         game.socket.on("update", updateHandler);
+        console.log("Successfully started server !")
     }
 
 

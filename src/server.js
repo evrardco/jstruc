@@ -16,6 +16,8 @@ UUID            = require('node-uuid'),
 verbose         = true,
 app             = express();
 
+
+
 /* Express server set up. */
 
 //The express server handles passing our content to the browser,
@@ -25,7 +27,13 @@ app             = express();
 
 //Tell the server to listen for incoming connections
 var http = require('http').createServer(app)
-var sio = require('socket.io')(http);
+var sio = require('socket.io')(http, {
+    cors: {
+      origin: "http://192.168.0.239:8080",
+      methods: ["GET", "POST"]
+    },
+    allowEIO3: true
+});
 
 
 http.listen(gameport);
@@ -71,23 +79,29 @@ sio.use(function(socket, next) {
 
 
 var p1 = undefined;
+var p1_ip = undefined;
 var p2 = undefined;
+var p2_ip = undefined;
+
 //Socket.io will call this function when a client connects, 
 //So we can send that client a unique ID we use so we can 
 //maintain the list of players.
 sio.sockets.on('connection', function (client) {
     if(p1 === undefined){
         p1 = client;
+        p1_ip = client.handshake.address
         client.emit("left");
+        client.emit("waiting");
         console.log("Left player connected.");
-    }else{
-        if(p2 === undefined){
+    } else {
+        if(p2 === undefined && p1_ip !== client.handshake.address){
             p2 = client;
+            p2_ip = client.handshake.address
             client.emit("right");
             
             console.log("Right player connected.");
-        }else{
-            client.emit('disconnect', {reason: 'server full.'});
+        } else {
+            client.emit('jstruc-disconnect', {reason: 'server full.'});
             
         }
     }

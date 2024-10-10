@@ -32,29 +32,53 @@ document.addEventListener('readystatechange', event => {
 });
 
 export function startup(){
-    init();
-    game.scenario.populate();
-    launch();
+    init().then( () => {
+        game.scenario.populate();
+        launch();
+    });
 }
 
-function init(){
-    
+async function init(){
+    let url = window.location.href;
+    //send a GET request to the server, asking if this is single player or multiplayer
     game = new Game();
-    game.scenario = pong;
-    game.local = false;
-    window.addEventListener("keydown", keyDispatch);
-    window.addEventListener("keyup", keyRemove);
-
-    if(!game.local){
-        game.socket = io(`http://${process.env.SERVER_IP}:${process.env.PORT}`);
-        //Now we can listen for that event
-        game.socket.on('onconnected', function( data ) {
-                //Note that the data is the object we sent from the server, as is. So we can assume its id exists. 
-            console.log( 'Connected successfully to the socket.io server. My server side ID is ' + data.id );
-        });
-        game.socket.on("update", updateHandler);
-        console.log("Successfully started server !")
-    }
+    console.log("Sending mode request to " + `${url}?single`)
+    await fetch(
+        `${url}?single`
+    ).then(
+        response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error(`bad request`);
+            }
+        }
+    ).then(data => {
+        console.log(`received data: ${JSON.stringify(data)}`);
+        if (JSON.stringify(data) === "true") {
+            game.local = true;
+            console.log(`single player mode`);
+        } else {
+            game.local = false;
+            console.log(`multiplayer mode`);
+        }
+    
+        game.scenario = pong;
+        window.addEventListener("keydown", keyDispatch);
+        window.addEventListener("keyup", keyRemove);
+        if(!game.local){
+            console.log(`connecting to server`);
+            console.log("Connecting to socket at " + url)
+            game.socket = io(url);
+            //Now we can listen for that event
+            game.socket.on('onconnected', function( data ) {
+                    //Note that the data is the object we sent from the server, as is. So we can assume its id exists. 
+                console.log( 'Connected successfully to the socket.io server. My server side ID is ' + data.id );
+            });
+            game.socket.on("update", updateHandler);
+            console.log("Successfully started server !")
+        }
+    });
 
 
 
@@ -115,7 +139,6 @@ function mainLoop(){
 function keyDispatch(event){
     if(game.keyPressed.indexOf(event.key) !== -1) return;
     game.keyPressed.push(event.key);
-    console.log(game.keyPressed);
 }
 
 function keyRemove(event){
@@ -123,5 +146,4 @@ function keyRemove(event){
     if(i !== -1){
         game.keyPressed.splice(i, 1);
     }
-    console.log(game.keyPressed);
 }

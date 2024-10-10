@@ -44,10 +44,19 @@ console.log('\t :: Express :: Listening on port ' + gameport );
 
 //By default, we forward the / path to index.html automatically.
 app.get( '/', function( req, res ){ 
-    res.sendFile( __dirname + '/index.html' );
+    if (req.query && Object.keys(req.query).length > 0) {
+        console.log('\t  :: Express  :: Query received: ', req.query );
+        res.send(process.env.SINGLEPLAYER);
+    } else {
+        res.sendFile( __dirname + '/index.html' );
+    }
+    
 });
 
-
+app.get('/', function(req, res){
+    res.send('id: ' + req.query.id);
+});
+  
 //This handler will listen for requests on /*, any file from the root of our server.
 //See expressjs documentation for more info on routing.
 

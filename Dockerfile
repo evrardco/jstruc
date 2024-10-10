@@ -3,7 +3,8 @@ ARG dev=0
 COPY src /var/jstruc
 ENV SERVER_IP=127.0.0.1
 ENV SERVER_PORT=8000
-ENV MULTIPLAYER=false
+ENV SERVER_URL="http://${SERVER_IP}:${SERVER_PORT}"
+ENV SINGLEPLAYER=true
 RUN \
     if [ "$dev" = "1" ]; then \
         rm -rf /var/jstruc && \

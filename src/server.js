@@ -7,7 +7,7 @@
 */
 
 var 
-gameport        = process.env.PORT || 8080,
+gameport        = process.env.SERVER_PORT,
 
 
 express         = require('express'),
@@ -29,7 +29,7 @@ app             = express();
 var http = require('http').createServer(app)
 var sio = require('socket.io')(http, {
     cors: {
-      origin: "http://192.168.0.239:8080",
+      origin: `http://${process.env.SERVER_IP}:${process.env.PORT}`,
       methods: ["GET", "POST"]
     },
     allowEIO3: true

@@ -46,7 +46,7 @@ function init(){
     window.addEventListener("keyup", keyRemove);
 
     if(!game.local){
-        game.socket = io("http://192.168.0.239:8080");
+        game.socket = io(`http://${process.env.SERVER_IP}:${process.env.PORT}`);
         //Now we can listen for that event
         game.socket.on('onconnected', function( data ) {
                 //Note that the data is the object we sent from the server, as is. So we can assume its id exists. 

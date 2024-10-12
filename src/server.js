@@ -98,12 +98,22 @@ var p1_name = undefined;
 var p2 = undefined;
 var p2_name = undefined;
 let populated = 0; 
-let game_started = 0;
+let game_started = false;
 //Socket.io will call this function when a client connects, 
 //So we can send that client a unique ID we use so we can 
 //maintain the list of players.
 n_conn = 0;
-sio.disconnectSockets()
+function reset_game_state() {
+    console.log("Resetting server state")
+    sio.disconnectSockets();
+    p1 = undefined;
+    p1_name = undefined;
+    p2 = undefined;
+    p2_name  = undefined;
+    n_conn = 0;
+    populated = 0;
+    game_started = false;
+}
 sio.sockets.on('connection', function (client) {
     if (n_conn >= 2) {
         client.emit("full");
@@ -175,13 +185,7 @@ sio.sockets.on('connection', function (client) {
             //Useful to know when someone disconnects
         console.log('\t socket.io:: client disconnected ' + client.userid );
         if (game_started) {
-            sio.disconnectSockets();
-            p1 = undefined;
-            p1_name = undefined;
-            p2 = undefined;
-            p2_name  = undefined;
-            n_conn = 0;
-            populated = 0;
+            reset_game_state();
         } else {
             if (client == p1) {
                 p1 = p2;
@@ -196,6 +200,10 @@ sio.sockets.on('connection', function (client) {
     });
     client.on("game_start", () => {
         game_started = true;
+        setTimeout( () => {
+            reset_game_state();
+        }, 1000 * 60 * 10);
+        
     })
     client.on('update', function(data){
         console.log("updating, other: "+client.other);

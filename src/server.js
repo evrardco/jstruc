@@ -5,6 +5,8 @@
     MIT Licensed. See LICENSE for full license.
     Usage : node simplest.app.js
 */
+var 
+single_player = process.env.SINGLEPLAYER === "true" ? true : false;
 
 var 
 gameport        = process.env.SERVER_PORT,
@@ -46,9 +48,12 @@ console.log('\t :: Express :: Listening on port ' + gameport );
 app.get( '/', function( req, res ){ 
     if (req.query && Object.keys(req.query).length > 0) {
         console.log('\t  :: Express  :: Query received: ', req.query );
-        res.send(process.env.SINGLEPLAYER);
+        res.send(single_player);
     } else {
-        res.sendFile( __dirname + '/index.html' );
+        if (single_player) 
+            res.sendFile( __dirname + '/index_solo.html' );
+        else
+            res.sendFile( __dirname + '/index_multi.html' );
     }
     
 });

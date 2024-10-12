@@ -74,12 +74,40 @@ async function init(){
             game.socket.on('onconnected', function( data ) {
                     //Note that the data is the object we sent from the server, as is. So we can assume its id exists. 
                 console.log( 'Connected successfully to the socket.io server. My server side ID is ' + data.id );
+                game.pid = data.id;
             });
-            game.socket.on("update", updateHandler);
-            console.log("Successfully started server !")
+            let buttonPressed = new Promise(function(resolve) {
+                let button = document.getElementById("start");
+                button.addEventListener("click", resolve);
+            });
+            return buttonPressed
+        } else {
+            return Promise.reject('solo');
         }
-    });
+    }).then( () => {
+        console.log('Sending name to server')
+        let button = document.getElementById("start");
+        button.setAttribute("disabled", "true");
+        let nameBox = document.getElementById("playerName");
+        nameBox.setAttribute("placeholder", "Waiting for server reply...");
+        nameBox.setAttribute("disabled",  "true");
+        fetch(`${url}`, {
+            method: "POST",
+            body: JSON.stringify({
+              connId:  game.pid,
+              playerName: document.getElementById("playerName"),
+            }),
+            headers: {
+              "Content-type": "application/json; charset=UTF-8" 
+            }
+        });
 
+    }).catch((result) => {
+        if (result !== 'solo')
+            alert("Unexpected error: " + result);
+        else 
+            console.log("Starting solo game !");
+    });
 
 
 }

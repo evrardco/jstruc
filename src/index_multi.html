@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script type="text/javascript" src="helpers.js"></script>
+    <script type="module" src="script.js"></script>
+    <script src="/node_modules/socket.io-client/dist/socket.io.js"></script>
+    
+  </head>
+  <body>
+    <div class="game_area" id="ui">
+      <h1>Multiplayer pong</h1>
+      <p id="game_info">Enter your player name below</p>
+      <input type="text" id="playerName" placeholder="<NAME>" >
+      <button id="start">Start Game !</button>
+    </div>
+    <canvas id="mainScreen" width="512" height="512" style="visibility: hidden;" ></canvas>
+    
+    
+
+  </body>
+</html>

@@ -40,7 +40,7 @@ export var pong = {
         
         
         
-        let right = new Player(game.width - 2*25, game.height/2 - 150/2, 25, 150, "player", ["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp"]);
+        let right = new Player(game.width - 2*25, game.height/2 - 150/2, 25, 150, "player", ["", "", "", ""]);
         let left;
 
         if(game.local){
@@ -66,16 +66,17 @@ export var pong = {
             left = new Player(25, game.height/2 - 150/2, 25, 150, "player", ["", "", "", ""]);//left, right, up, down
             let other;
             //networking
-            game.socket.on("left", function(){
+            game.socket.on("left", function(cb){
                 console.log("You are the player on the left");
                 game.side = "left";
                 game.actors.push(left);
                 left.keyMap = game.defaultKeyMap;
                 game.other = right;
                 game.player = left;
+                cb();
             });
 
-            game.socket.on("right", function(){
+            game.socket.on("right", function(cb){
                 console.log("You are the player on the right");
                 game.side = "right";
                 game.actors.push(left);
@@ -83,7 +84,7 @@ export var pong = {
                 right.keyMap = game.defaultKeyMap;
                 game.other = left;
                 game.player = right;
-                game.socket.emit("start");
+                cb();
             });
 
 
@@ -97,12 +98,14 @@ export var pong = {
             game.actors.push(fpsText);
 
         }
+        game.socket.emit("populated");
     
     },
 
     synchronize: function(){
         game.socket.emit("update", {
-            type: "player", 
+            type: "player",
+            side: game.side,
             pos: {
                 x: game.player.x,
                 y: game.player.y

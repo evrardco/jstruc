@@ -14,7 +14,6 @@ import { collisions } from "./scenarios/tests/collision_test.js"
 
 
 export let game;
-
 document.addEventListener('readystatechange', event => {
 
     if (event.target.readyState === "interactive") {      //same as:  document.addEventListener("DOMContentLoaded"...   // same as  jQuery.ready
@@ -34,7 +33,17 @@ document.addEventListener('readystatechange', event => {
 export function startup(){
     init().then( () => {
         game.scenario.populate();
-        launch();
+        let wait_game_ready = new Promise( (resolve, reject) => {
+            game.socket.on("players_ready", () => {
+                console.log("Players ready !");
+                resolve();
+            });
+        });
+        console.log("Waiting for all players to be ready...");
+        return wait_game_ready;
+    }).then( () => {
+        game.socket.on("update", updateHandler);
+        launch()
     });
 }
 
@@ -76,6 +85,10 @@ async function init(){
                 console.log( 'Connected successfully to the socket.io server. My server side ID is ' + data.id );
                 game.pid = data.id;
             });
+            game.socket.on('full', () => {
+                alert("The server is full");
+                return Promise.reject('full');
+            })
             let buttonPressed = new Promise(function(resolve) {
                 let button = document.getElementById("start");
                 button.addEventListener("click", resolve);
@@ -85,23 +98,26 @@ async function init(){
             return Promise.reject('solo');
         }
     }).then( () => {
+        //deactivate the input elements
         console.log('Sending name to server')
         let button = document.getElementById("start");
         button.setAttribute("disabled", "true");
         let nameBox = document.getElementById("playerName");
+        let nameVal = nameBox.value;
         nameBox.setAttribute("placeholder", "Waiting for server reply...");
         nameBox.setAttribute("disabled",  "true");
-        fetch(`${url}`, {
-            method: "POST",
-            body: JSON.stringify({
-              connId:  game.pid,
-              playerName: document.getElementById("playerName"),
-            }),
-            headers: {
-              "Content-type": "application/json; charset=UTF-8" 
+        //sending the name of the player to the server
+        console.log(`Sending name ${nameVal} to server`);
+        game.socket.emit("name", nameVal, (response) => {
+            console.log(response); // "got it"
+            if (response === "ko") {
+                Promise.reject("Name refused");
+            } else if (response === "ok") {
+                console.log(`Name ${nameVal} accepted by server`);
             }
         });
-
+        console.log('Waiting for the other player...');
+        document.getElementById("playerName").placeholder = "Waiting for the other player...";
     }).catch((result) => {
         if (result !== 'solo')
             alert("Unexpected error: " + result);
@@ -113,6 +129,9 @@ async function init(){
 }
 
 function updateHandler(data){
+    if(data.type === "player" && data.side === game.side) {
+        return;
+    }
     let toUpdate = (data.type === "player") ? game.other : game.ball;
     toUpdate.x = data.pos.x;
     toUpdate.y = data.pos.y;
@@ -124,10 +143,17 @@ function updateHandler(data){
 
 function launch(){
     if(!game.local){
-        game.socket.on("ready", function(){
-            console.log("The game is ready."); 
-            mainLoop();
+        console.log("The game is ready.");
+        //disable ui
+        document.getElementById("ui").setAttribute("style", "visibility:hidden");
+        document.getElementById("mainScreen").removeAttribute("style");
+        game.socket.on("disconnect", (reason, details) => {
+            alert('Disconnected from server !')
+            game.over = true;
         });
+        game.socket.emit("game_start");
+
+        mainLoop();
     }else{
         mainLoop();
     }
@@ -160,7 +186,10 @@ function mainLoop(){
     }
     
     game.tickNumber++;
-    window.requestAnimationFrame(mainLoop);
+    if (!game.over) {
+        window.requestAnimationFrame(mainLoop);
+    }
+    
 
 }
 

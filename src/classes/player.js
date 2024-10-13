@@ -13,8 +13,17 @@ export class Player extends Entity {
         }else{
             this.keyMap = keyMap;
         }
+        this._remote_player = false;
     }
 
+    set remote_player(value) {
+        this._remote_player = value;
+    }
+
+    get remote_player() {
+        return this._remote_player;
+    }
+    
     collide(){
         super.collide();
         if(this.y < 0) {
@@ -61,7 +70,9 @@ export class Player extends Entity {
 
     }
     act(delta){
-        this.setSpeed(0, 0);
+        if (!this.remote_player) {
+            this.setSpeed(0, 0);
+        }
         game.keyPressed.forEach(elem => {
             if(elem === this.keyMap[0]){
                 this.vx = 0; //disable horizontal movement

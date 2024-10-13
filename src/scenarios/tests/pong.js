@@ -74,6 +74,7 @@ export var pong = {
                 left.keyMap = game.defaultKeyMap;
                 game.other = right;
                 game.player = left;
+                game.other.remote_player = true;
                 cb();
             });
 
@@ -85,6 +86,7 @@ export var pong = {
                 right.keyMap = game.defaultKeyMap;
                 game.other = left;
                 game.player = right;
+                game.other.remote_player = true;
                 cb();
             });
 
@@ -105,9 +107,11 @@ export var pong = {
     },
 
     synchronize: function() {
+        let tstamp = Date.now();
         game.socket.emit("update", {
             type: "player",
             side: game.side,
+            
             pos: {
                 x: game.player.x,
                 y: game.player.y
@@ -116,6 +120,7 @@ export var pong = {
                 x: game.player.vx,
                 y: game.player.vy
             },
+            tstamp: tstamp
         });
         if(game.side === "left") {
             game.socket.emit("update", {
@@ -128,6 +133,7 @@ export var pong = {
                     x: game.ball.vx,
                     y: game.ball.vy
                 },
+                tstamp: tstamp
             });
         }
     }

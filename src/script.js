@@ -1,16 +1,6 @@
 //don't add stuff that might throw errors here...
-import {Player} from "./classes/player.js"
 import {Game} from "./classes/game.js"
-import {ScreenText} from "./classes/screentext.js"
-import {Ball} from "./classes/ball.js"
-import {Rectangle} from "./classes/rectangle.js"
-import {Vector2} from "./classes/vector2.js"
-import { Bot } from "./classes/bot.js";
-import { Drawable } from "./classes/drawable.js";
-import { Circle } from "./classes/circle.js";
-import { Goal } from "./classes/goal.js";
 import { pong } from "./scenarios/tests/pong.js"
-import { collisions } from "./scenarios/tests/collision_test.js"
 
 
 export let game;
@@ -36,8 +26,10 @@ export function startup(){
         game.scenario.populate();
         let wait_game_ready = new Promise( (resolve, reject) => {
             if (!game.local) {
-                game.socket.on("players_ready", () => {
+                game.socket.on("players_ready", (start_time) => {
+                    game.start_time = start_time;
                     console.log("Players ready !");
+                    console.log(`game.start_time: ${game.start_time}`);
                     resolve();
                 });
             } else {
@@ -136,17 +128,25 @@ async function init(){
 
 }
 
+function interpolate(a0, va, t0, t1) {
+    let dt = game.timeScale  * (t1 - t0) / 1000;
+    if (dt > 0.1) return a0;
+    return a0 + (va * dt);
+}
 function updateHandler(data){
     if(data.type === "player" && data.side === game.side) {
         return;
     }
+    let t1 = Date.now();
+
     let toUpdate = (data.type === "player") ? game.other : game.ball;
-    toUpdate.x = data.pos.x;
-    toUpdate.y = data.pos.y;
+    toUpdate.pos.x = interpolate(data.pos.x, data.vel.x, data.tstamp, t1);
+    toUpdate.pos.y = interpolate(data.pos.y, data.vel.y, data.tstamp, t1);
 
     toUpdate.vx = data.vel.x;
     toUpdate.vy = data.vel.y;
 }
+
 
 
 function launch(){
@@ -167,37 +167,48 @@ function launch(){
     }
 }
 
-function mainLoop(){
+function mainLoop() {
 
     game.last = game.now;
     game.now = Date.now();
-
+    if (game.now < game.start_time) {
+        window.requestAnimationFrame(mainLoop);
+        return;
+        
+    }
     //acting
-    for(let i = 0; i < game.actors.length; i++){
+    for (let i = 0; i < game.actors.length; i++) {
         // console.log("iterating through: " + game.actors[i].name);
         game.actors[i].act(game.timeScale * (game.now - game.last) / 1000);
     }
 
     //colliding
-    for(let i = game.actors.length - 1; i >= 0; i--){
+    for (let i = game.actors.length - 1; i >= 0; i--) {
         game.actors[i].collide();
     }
 
     game.context.clearRect(0, 0, game.width, game.height);
     //drawing
-    for(let i = 0; i < game.actors.length; i++){
+    for (let i = 0; i < game.actors.length; i++) {
         game.actors[i].draw(game.context);
     }
-    
-    if(!game.local){
-       game.scenario.synchronize();
+
+    if (!game.local) {
+        if (
+            game.last_sync === undefined ||
+            (game.last_sync !== undefined && game.now - game.last_sync > 16)
+        ) {
+            game.scenario.synchronize();
+            game.last_sync = game.now;
+        }
+        
     }
-    
+
     game.tickNumber++;
     if (!game.over) {
         window.requestAnimationFrame(mainLoop);
     }
-    
+
 
 }
 

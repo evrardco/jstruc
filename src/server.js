@@ -1,3 +1,5 @@
+const { start } = require('repl');
+
 /*  Copyright (c) 2012 Sven "FuzzYspo0N" Bergström 
     
     http://underscorediscovery.com
@@ -139,6 +141,8 @@ sio.sockets.on('connection', function (client) {
                     "Player 1 disconnected while waiting " +
                     "for the name of player 2"
                 )
+                n_conn = 1;
+                
             } else {
                 p2_name = data;
                 cb("ok");
@@ -157,8 +161,9 @@ sio.sockets.on('connection', function (client) {
             let check_players_ready = () => {
                 n_ready += 1;
                 if (n_ready  >=  2) {
-                    p1.emit('players_ready');
-                    p2.emit('players_ready');
+                    let start_time = Date.now() + 1000;
+                    p1.emit('players_ready', start_time);
+                    p2.emit('players_ready', start_time);
                     p1.other = p2;
                     p2.other = p1;
                 }
@@ -189,10 +194,11 @@ sio.sockets.on('connection', function (client) {
         } else {
             if (client == p1) {
                 p1 = p2;
-                p1_name = p2;
+                p1_name = p2_name;
             } 
             p2 = undefined;
             p2_name = undefined;
+            n_conn--;
         }
         
 
@@ -206,7 +212,6 @@ sio.sockets.on('connection', function (client) {
         
     })
     client.on('update', function(data){
-        console.log("updating, other: "+client.other);
         if(client.other === undefined) return;
         client.other.emit('update', data);
         if (client === p1) {

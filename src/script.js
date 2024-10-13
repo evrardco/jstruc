@@ -31,18 +31,26 @@ document.addEventListener('readystatechange', event => {
 });
 
 export function startup(){
+    
     init().then( () => {
         game.scenario.populate();
         let wait_game_ready = new Promise( (resolve, reject) => {
-            game.socket.on("players_ready", () => {
-                console.log("Players ready !");
+            if (!game.local) {
+                game.socket.on("players_ready", () => {
+                    console.log("Players ready !");
+                    resolve();
+                });
+            } else {
                 resolve();
-            });
+            }
+            
         });
         console.log("Waiting for all players to be ready...");
         return wait_game_ready;
     }).then( () => {
-        game.socket.on("update", updateHandler);
+        if (!game.local) {
+            game.socket.on("update", updateHandler);
+        }
         launch()
     });
 }

@@ -48,6 +48,7 @@ export var pong = {
             left = new Bot(25, game.height/2 - 150/2, 25, 150, "bot", ball);
             game.other = left;
             game.player = right;
+            right.keyMap = game.defaultKeyMap;
 
             game.actors.push(left);
             game.actors.push(right);
@@ -97,12 +98,13 @@ export var pong = {
             game.actors.push(scoreboard);
             game.actors.push(fpsText);
 
+            game.socket.emit("populated");
         }
-        game.socket.emit("populated");
+
     
     },
 
-    synchronize: function(){
+    synchronize: function() {
         game.socket.emit("update", {
             type: "player",
             side: game.side,
@@ -115,7 +117,7 @@ export var pong = {
                 y: game.player.vy
             },
         });
-        if(game.side === "left"){
+        if(game.side === "left") {
             game.socket.emit("update", {
                 type: "ball", 
                 pos: {

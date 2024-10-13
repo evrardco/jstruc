@@ -52,8 +52,7 @@ export var pong = {
 
             game.actors.push(left);
             game.actors.push(right);
-            game.actors.push(scoreboard);
-            game.actors.push(scoreboard);
+            //game.actors.push(scoreboard);
             game.actors.push(fpsText);
             game.actors.push(ball);
             game.actors.push(line);
@@ -97,7 +96,7 @@ export var pong = {
             game.actors.push(goalRight);
             game.actors.push(line);
             game.actors.push(circle);
-            game.actors.push(scoreboard);
+            //game.actors.push(scoreboard);
             game.actors.push(fpsText);
 
             game.socket.emit("populated");
@@ -107,7 +106,7 @@ export var pong = {
     },
 
     synchronize: function() {
-        let tstamp = Date.now();
+        let tstamp = Date.now() - game.start_time;
         game.socket.emit("update", {
             type: "player",
             side: game.side,

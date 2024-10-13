@@ -26,10 +26,8 @@ export function startup(){
         game.scenario.populate();
         let wait_game_ready = new Promise( (resolve, reject) => {
             if (!game.local) {
-                game.socket.on("players_ready", (start_time) => {
-                    game.start_time = start_time;
+                game.socket.on("players_ready", () => {
                     console.log("Players ready !");
-                    console.log(`game.start_time: ${game.start_time}`);
                     resolve();
                 });
             } else {
@@ -78,7 +76,7 @@ async function init(){
         if(!game.local){
             console.log(`connecting to server`);
             console.log("Connecting to socket at " + url)
-            game.socket = io(url);
+            game.socket = io(url, {transports: ["websocket"]});
             //Now we can listen for that event
             game.socket.on('onconnected', function( data ) {
                     //Note that the data is the object we sent from the server, as is. So we can assume its id exists. 
@@ -137,14 +135,21 @@ function updateHandler(data){
     if(data.type === "player" && data.side === game.side) {
         return;
     }
-    let t1 = Date.now();
-
+    let t1 = Date.now() - game.start_time;
+    // if (game.last_tstamp !== undefined && game.last_tstamp > data.tstamp) {
+    //     return;
+    // }
+    //if tstamp is older than 2 frames, reject update
+    if (t1 - data.tstamp > 2 * 16) {
+        return;
+    }
     let toUpdate = (data.type === "player") ? game.other : game.ball;
     toUpdate.pos.x = interpolate(data.pos.x, data.vel.x, data.tstamp, t1);
     toUpdate.pos.y = interpolate(data.pos.y, data.vel.y, data.tstamp, t1);
 
     toUpdate.vx = data.vel.x;
     toUpdate.vy = data.vel.y;
+    game.last_tstamp = data.tstamp;
 }
 
 
@@ -168,14 +173,12 @@ function launch(){
 }
 
 function mainLoop() {
-
+    if (game.start_time === undefined) {
+        game.start_time = Date.now();
+    }
     game.last = game.now;
     game.now = Date.now();
-    if (game.now < game.start_time) {
-        window.requestAnimationFrame(mainLoop);
-        return;
-        
-    }
+
     //acting
     for (let i = 0; i < game.actors.length; i++) {
         // console.log("iterating through: " + game.actors[i].name);

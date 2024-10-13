@@ -154,6 +154,11 @@ sio.sockets.on('connection', function (client) {
 
 
     client.on('populated', () => {
+        if (n_conn < 2) {
+            game_started = true;
+            reset_game_state();
+            return;
+        }
         populated += 1;
         console.log("Populated: " + populated)
         if (populated >= 2) {
@@ -161,9 +166,8 @@ sio.sockets.on('connection', function (client) {
             let check_players_ready = () => {
                 n_ready += 1;
                 if (n_ready  >=  2) {
-                    let start_time = Date.now() + 1000;
-                    p1.emit('players_ready', start_time);
-                    p2.emit('players_ready', start_time);
+                    p1.emit('players_ready');
+                    p2.emit('players_ready');
                     p1.other = p2;
                     p2.other = p1;
                 }

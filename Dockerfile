@@ -17,5 +17,5 @@ RUN \
 RUN \
     echo "cd /var/jstruc && npm run start" > /usr/bin/run_server.sh && \
     chmod +x /usr/bin/run_server.sh
-CMD [ "npm", "start" ]
+CMD [ "run_server.sh" ]
 

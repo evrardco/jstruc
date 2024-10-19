@@ -71,7 +71,7 @@ app.get('/', function(req, res){
 app.get( '/*' , function( req, res, next ) {
 
     //This is the current file they have requested
-    var file = req.params[0]; 
+    var file = req.params[0].replace(app_path + "/", ""); 
 
         //For debugging, we can track what files are requested.
     if(verbose) console.log('\t :: Express :: file requested : ' + file);

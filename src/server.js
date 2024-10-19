@@ -20,6 +20,7 @@ UUID            = require('node-uuid'),
 verbose         = true,
 app             = express();
 
+var app_path = process.env.SINGLEPLAYER === "true" ? "jstruc-solo" : "jstruc-multi"
 
 
 /* Express server set up. */
@@ -47,7 +48,7 @@ http.listen(gameport);
 console.log('\t :: Express :: Listening on port ' + gameport );
 
 //By default, we forward the / path to index.html automatically.
-app.get( '/', function( req, res ){ 
+app.get( `/${app_path}/`, function( req, res ){ 
     if (req.query && Object.keys(req.query).length > 0) {
         console.log('\t  :: Express  :: Query received: ', req.query );
         res.send(single_player);
